@@ -130,3 +130,39 @@ synq <- function(..., .echo = TRUE)
                                          purrr::map_dfc( ~character() )
     else dplyr::rename_all( QQ, ~stringr::str_split( ., "\\.", simplify=TRUE )[,2] )
 }
+
+#' Upload and annotate a file
+#'
+#' The function uploads a local file and annotates it with fields provided as named arguments
+#'
+#' @param .fn Filename of the local file to upload
+#' @param .dest Synapse ID of the destination Folder
+#' @param .forceVer Maps to forceVersion argument of synStore(), which is defined as
+#' "Indicates whether the method should increment the version of the object even if
+#' nothing has changed. Defaults to TRUE."
+#' @param ... Named arguments specifying key-value pairs to serve as annotations
+#' @return Annotated synapse entity object
+#' @examples
+#' \dontrun{
+#' synUpload( "mtcars.csv", "syn12180284", Field1 = c("abc","def"), Field2 = 123 )
+#' }
+#' @importFrom magrittr %>%
+#' @export
+synUpload <- function( .fn, .dest, ..., .forceVer = TRUE )
+{
+    ## Compose key-value annotations
+    A <- list(...)
+    if( length(A) > 0 && (is.null(names(A)) || any(names(A) == "")) )
+        stop( "All annotations must be provided as named arguments" )
+
+    ## Compose and synStore() the file entity
+    ## Annotate the newly-stored entity
+    f <- synapser::File( .fn, parent = .dest ) %>%
+        synapser::synStore( forceVersion = .forceVer )
+
+    ## Annotate the new entity
+    synapser::synSetAnnotations( f, A )
+
+    ## Re-fetch the entity (without downloading the file), because f is now stale
+    synapser::synGet( f$properties$id, downloadFile=FALSE )
+}
