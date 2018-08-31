@@ -116,7 +116,8 @@ synq <- function(..., .echo = TRUE)
 
     ## Named arguments make up the "where" portion of the query
     .where <- A %>% dplyr::filter( name != "" ) %>%
-        mutate_at( "value", map_if, is.character, ~str_c( '"', .x, '"' ) ) %>%
+        dplyr::mutate_at( "value", purrr::map_if,
+                         is.character, ~stringr::str_c( '"', .x, '"' ) ) %>%
         with( purrr::map2(name, value, ~stringr::str_c('"', .x, '"==', .y)) ) %>%
         stringr::str_flatten( " and " )
 
