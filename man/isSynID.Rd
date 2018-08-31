@@ -2,20 +2,22 @@
 % Please edit documentation in R/syn.R
 \name{isSynID}
 \alias{isSynID}
-\title{Identifies if its argument is a valid Synapse ID}
+\title{Check validity of Synapse IDs}
 \usage{
 isSynID(ids)
 }
 \arguments{
-\item{ids}{A character vector containing one or more strings to identify.}
+\item{ids}{A vector or list containing one or more objects to identify.}
 }
 \value{
-Logical values indicating whether each element of the input vector is a valid Synapse ID.
+Logical values indicating whether each element of the input is a valid Synapse ID.
 }
 \description{
-Identifies if its argument is a valid Synapse ID
+Identifies if its argument is a valid Synapse ID character string
 }
 \examples{
-isSynID( c("syn1234", "syn", "syn11ab") )
+isSynID( c("syn1234", "syn", "syn123ab" ) )
 # [1]  TRUE FALSE FALSE
+isSynID( list( mtcars, 123, "syn123" ) )
+# [1] FALSE FALSE  TRUE
 }
