@@ -4,6 +4,9 @@ Version: 0.1
 Authors@R: person("Artem", "Sokolov", email = "artem.sokolov@gmail.com", role = c("aut", "cre"))
 Description: Features, extensions and UI modifications built on top of Sage Bionetworks' synapser.
 Depends: R (>= 3.5.1)
+Imports:
+    tidyverse,
+    synapser
 License: MIT
 Encoding: UTF-8
 LazyData: true
