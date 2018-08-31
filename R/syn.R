@@ -81,3 +81,52 @@ synAncestry <- function(...)
     ## Recurse up the chain
     c( id, synAncestry( s$properties$parentId ) )
 }
+
+#' Streamlined version of synQuery()
+#'
+#' An intuitive interface for composing Synapse queries
+#'
+#' @param ... Arguments defining the query. Unnamed arguments make up the fields to be selected.
+#' Named arguments define the query conditions.
+#' @param .echo Whether to display the final query string. (Default: TRUE)
+#' @return The function always returns a data frame with columns defined by the unnamed arguments. If the query returned no results, the data frame will have zero rows (but non-zero number of columns).
+#' @examples
+#' \dontrun{
+#' synq( "id", "name", "projectId", parentId = "syn15673834", type = "dataset" )
+#' # select id,name,projectId from entity where "parentId"=="syn15673834" and "type"=="dataset" 
+#' # # A tibble: 1 x 3
+#' #   projectId id          name      
+#' #       <dbl> <chr>       <chr>     
+#' # 1  12180284 syn15663039 mtcars.csv
+#'
+#' synq( "id", "name", projectId = "12180284", type="Nonexistent", .echo=FALSE )
+#' # # A tibble: 0 x 2
+#' # # ... with 2 variables: id <chr>, name <chr>
+#' 
+#' }
+#' @importFrom magrittr %>%
+#' @export
+synq <- function(..., .echo = TRUE)
+{
+    ## Capture the arguments
+    A <- tibble::enframe(list(...), "name", "value")
+
+    ## Unnamed arguments make up the "what" portion of the query
+    .what <- A %>% dplyr::filter( name == "" ) %>% with( stringr::str_flatten(value, ",") )
+
+    ## Named arguments make up the "where" portion of the query
+    .where <- A %>% dplyr::filter( name != "" ) %>%
+        with( purrr::map2(name, value, ~stringr::str_c('"', .x, '"=="', .y, '"')) ) %>%
+        stringr::str_flatten( " and " )
+
+    ## Compose the final query string
+    qq <- stringr::str_c( "select ", .what, " from entity where ", .where )
+    if( .echo ) cat( qq, "\n" )
+
+    ## Perform the query
+    QQ <- synapser::synQuery(qq)$results %>% bind_rows
+    if( nrow(QQ) == 0 )
+        dplyr::filter( A, name == "" )$value %>% purrr::set_names() %>%
+                                         purrr::map_dfc( ~character() )
+    else dplyr::rename_all( QQ, ~stringr::str_split( ., "\\.", simplify=TRUE )[,2] )
+}

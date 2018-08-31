@@ -3,4 +3,5 @@
 export(isSynID)
 export(synAncestry)
 export(synDownloader)
+export(synq)
 importFrom(magrittr,"%>%")
