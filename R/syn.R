@@ -125,10 +125,15 @@ synq <- function(..., .echo = TRUE)
 
     ## Perform the query
     QQ <- synapser::synQuery(qq)$results %>% bind_rows
+
+    ## If query returned no results, compose a zero-row data frame
+    ## Columns are determined by the requested fields
     if( nrow(QQ) == 0 )
         dplyr::filter( A, name == "" )$value %>% purrr::set_names() %>%
                                          purrr::map_dfc( ~character() )
-    else dplyr::rename_all( QQ, ~stringr::str_split( ., "\\.", simplify=TRUE )[,2] )
+
+    ## Drop "entity." from the column names
+    else dplyr::rename_all( QQ, stringr::str_sub, 8 )
 }
 
 #' Upload and annotate a file
@@ -155,14 +160,7 @@ synUpload <- function( .fn, .dest, ..., .forceVer = TRUE )
     if( length(A) > 0 && (is.null(names(A)) || any(names(A) == "")) )
         stop( "All annotations must be provided as named arguments" )
 
-    ## Compose and synStore() the file entity
-    ## Annotate the newly-stored entity
-    f <- synapser::File( .fn, parent = .dest ) %>%
+    ## Compose, annotate and synStore() the file entity
+    synapser::File( .fn, parent = .dest, annotations=A ) %>%
         synapser::synStore( forceVersion = .forceVer )
-
-    ## Annotate the new entity
-    synapser::synSetAnnotations( f, A )
-
-    ## Re-fetch the entity (without downloading the file), because f is now stale
-    synapser::synGet( f$properties$id, downloadFile=FALSE )
 }
