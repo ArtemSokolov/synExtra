@@ -126,7 +126,7 @@ synq <- function(..., .echo = TRUE)
     if( .echo ) cat( qq, "\n" )
 
     ## Perform the query
-    QQ <- synapser::synQuery(qq)$results %>% dplyr::bind_rows
+    QQ <- synapser::synQuery(qq)$results %>% dplyr::bind_rows()
 
     ## If query returned no results, compose a zero-row data frame
     ## Columns are determined by the requested fields
