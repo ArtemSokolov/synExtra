@@ -3,6 +3,6 @@
 export(isSynID)
 export(synAncestry)
 export(synDownloader)
-export(synUpload)
+export(synName)
 export(synq)
 importFrom(magrittr,"%>%")

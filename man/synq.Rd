@@ -13,7 +13,9 @@ Named arguments define the query conditions.}
 \item{.echo}{Whether to display the final query string. (Default: TRUE)}
 }
 \value{
-The function always returns a data frame with columns defined by the unnamed arguments. If the query returned no results, the data frame will have zero rows (but non-zero number of columns).
+The function always returns a data frame with columns defined by the unnamed arguments.
+If the query returned no results, the data frame will have zero rows (but non-zero
+number of columns).
 }
 \description{
 An intuitive interface for composing Synapse queries
@@ -30,6 +32,5 @@ synq( "id", "name", "projectId", parentId = "syn15673834", type = "dataset" )
 synq( "id", "name", projectId = "12180284", type="Nonexistent", .echo=FALSE )
 # # A tibble: 0 x 2
 # # ... with 2 variables: id <chr>, name <chr>
-
 }
 }

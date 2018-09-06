@@ -6,16 +6,21 @@
 #' 
 #' Identifies if its argument is a valid Synapse ID character string
 #'
-#' @param ids A vector or list containing one or more objects to identify.
+#' @param ... One or more Synapse IDs. Accepts individual IDs, vectors or lists.
 #' @return Logical values indicating whether each element of the input is a valid Synapse ID.
 #' @examples
-#' isSynID( c("syn1234", "syn", "syn123ab" ) )
+#' isSynID( "syn1234", "syn", "syn123ab" )
 #' # [1]  TRUE FALSE FALSE
 #' isSynID( list( mtcars, 123, "syn123" ) )
 #' # [1] FALSE FALSE  TRUE
 #' @export
-isSynID <- function( ids )
-{ purrr::map_lgl( ids, is.character ) & grepl( "^syn[0-9]+$", ids ) }
+isSynID <- function( ... )
+{
+    ids <- purrr::flatten(list(...))
+    purrr::map_lgl( ids, is.character ) & grepl("^syn[0-9]+$", ids)
+}
+    
+#{ purrr::flatten(list(...)) %>% purrr::map_lgl( is.character ) & grepl( "^syn[0-9]+$", . ) }
 
 #' Instantiate a Synapse downloader
 #'
@@ -89,7 +94,9 @@ synAncestry <- function(...)
 #' @param ... Arguments defining the query. Unnamed arguments make up the fields to be selected.
 #' Named arguments define the query conditions.
 #' @param .echo Whether to display the final query string. (Default: TRUE)
-#' @return The function always returns a data frame with columns defined by the unnamed arguments. If the query returned no results, the data frame will have zero rows (but non-zero number of columns).
+#' @return The function always returns a data frame with columns defined by the unnamed arguments.
+#' If the query returned no results, the data frame will have zero rows (but non-zero
+#' number of columns).
 #' @examples
 #' \dontrun{
 #' synq( "id", "name", "projectId", parentId = "syn15673834", type = "dataset" )
@@ -102,7 +109,6 @@ synAncestry <- function(...)
 #' synq( "id", "name", projectId = "12180284", type="Nonexistent", .echo=FALSE )
 #' # # A tibble: 0 x 2
 #' # # ... with 2 variables: id <chr>, name <chr>
-#' 
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -138,31 +144,28 @@ synq <- function(..., .echo = TRUE)
     else dplyr::rename_all( QQ, stringr::str_sub, 8 )
 }
 
-#' Upload and annotate a file
-#'
-#' The function uploads a local file and annotates it with fields provided as named arguments
-#'
-#' @param .fn Filename of the local file to upload
-#' @param .dest Synapse ID of the destination Folder
-#' @param .forceVer Maps to forceVersion argument of synStore(), which is defined as
-#' "Indicates whether the method should increment the version of the object even if
-#' nothing has changed. Defaults to TRUE."
-#' @param ... Named arguments specifying key-value pairs to serve as annotations
-#' @return Annotated synapse entity object
+#' Look up filename based on synapse ID
+#' 
+#' Retrieves file names associated with given synapse IDs
+#' 
+#' @param ... One or more Synapse IDs. Accepts individual IDs, vectors or lists.
+#' @return A character vector of filenames corresponding to the provided synapse IDs
+#' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
-#' synUpload( "mtcars.csv", "syn12180284", Field1 = c("abc","def"), Field2 = 123 )
+#' synName( "syn1896429", "syn1901530" )
+#' #                            syn1896429                              syn1901530 
+#' #        "ESTIMATE_scores_PANCAN11.tsv" "ESTIMATE_scores_PANCAN11_RNASeqV2.tsv" 
 #' }
-#' @importFrom magrittr %>%
 #' @export
-synUpload <- function( .fn, .dest, ..., .forceVer = TRUE )
+synName <- function( ... )
 {
-    ## Compose key-value annotations
-    A <- list(...)
-    if( length(A) > 0 && (is.null(names(A)) || any(names(A) == "")) )
-        stop( "All annotations must be provided as named arguments" )
+    ids <- purrr::flatten( list(...) ) %>% purrr::flatten_chr()
+    
+    ## Isolate the unique set of ids and retrieve the name for each
+    idMap <- unique(ids) %>% purrr::set_names() %>%
+        purrr::map_chr( ~synapser::synGet( .x, downloadFile=FALSE )$properties$name )
 
-    ## Compose, annotate and synStore() the file entity
-    synapser::File( .fn, parent = .dest, annotations=A ) %>%
-        synapser::synStore( forceVersion = .forceVer )
+    ## Extend the mapping to all the requested values
+    idMap[ids]
 }

@@ -4,10 +4,10 @@
 \alias{isSynID}
 \title{Check validity of Synapse IDs}
 \usage{
-isSynID(ids)
+isSynID(...)
 }
 \arguments{
-\item{ids}{A vector or list containing one or more objects to identify.}
+\item{...}{One or more Synapse IDs. Accepts individual IDs, vectors or lists.}
 }
 \value{
 Logical values indicating whether each element of the input is a valid Synapse ID.
@@ -16,7 +16,7 @@ Logical values indicating whether each element of the input is a valid Synapse I
 Identifies if its argument is a valid Synapse ID character string
 }
 \examples{
-isSynID( c("syn1234", "syn", "syn123ab" ) )
+isSynID( "syn1234", "syn", "syn123ab" )
 # [1]  TRUE FALSE FALSE
 isSynID( list( mtcars, 123, "syn123" ) )
 # [1] FALSE FALSE  TRUE
