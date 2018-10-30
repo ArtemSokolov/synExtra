@@ -20,8 +20,6 @@ isSynID <- function( ... )
     purrr::map_lgl( ids, is.character ) & grepl("^syn[0-9]+$", ids)
 }
     
-#{ purrr::flatten(list(...)) %>% purrr::map_lgl( is.character ) & grepl( "^syn[0-9]+$", . ) }
-
 #' Instantiate a Synapse downloader
 #'
 #' Function creates and returns a downloader for files on Synapse.
@@ -168,4 +166,45 @@ synName <- function( ... )
 
     ## Extend the mapping to all the requested values
     idMap[ids]
+}
+
+#' Upload a directory structure to Synapse
+#' 
+#' Recursively uploads a directory and all of its content to the given Synapse project/folder
+#'
+#' @param localPath A character string to the local file / directory to upload
+#' @param parentId A synapse ID of the hosting project or parent folder on Synapse
+#' @importFrom magrittr %>%
+#' @return A nested list capturing the created hierarchy of Synapse IDs
+#' @export
+synStoreMany <- function( localPath, parentId )
+{
+    ## Case 1: localPath is a directory
+    if( dir.exists(localPath) )
+    {
+        ## Special case: current directory
+        if( localPath == "." ) return(synStoreMany( getwd(), parentId ))
+
+        ## Special case: parent directory
+        if( localPath == ".." ) return(synStoreMany( dirname(getwd()), parentId ))
+        
+        ## Replicate a folder to Synapse
+        cat( "Creating", basename(localPath), "\n" )
+        f <- synapser::Folder( name = basename(localPath), parentId = parentId ) %>% synapser::synStore()
+        pid <- f$properties$id
+
+        ## Recurse onto files in the directory
+        res <- list.files( localPath, include.dirs=TRUE, full.names=TRUE ) %>%
+            purrr::map( synStoreMany, pid ) %>% purrr::flatten() %>% list() %>% setNames( pid )
+    }
+    
+    ## Case 2: localPath is a file; simply upload it
+    else
+    {
+        f <- synapser::File( path=localPath, parent=parentId ) %>% synapser::synStore()
+        cat( "\n" )
+        res <- list(localPath) %>% setNames( f$properties$id )
+    }
+
+    invisible(res)
 }
