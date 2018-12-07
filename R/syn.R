@@ -109,7 +109,7 @@ synAncestry <- function(...)
 #' # # ... with 2 variables: id <chr>, name <chr>
 #' }
 #' @importFrom magrittr %>%
-#' @export
+#' @noRd
 synq <- function(..., .echo = TRUE)
 {
     ## Capture the arguments
