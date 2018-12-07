@@ -2,6 +2,7 @@
 
 export(isSynID)
 export(synAncestry)
+export(synChildren)
 export(synDownloader)
 export(synName)
 export(synStoreMany)
