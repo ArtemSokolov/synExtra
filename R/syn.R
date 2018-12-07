@@ -56,10 +56,10 @@ synName <- function( ... )
 #' @examples
 #' \dontrun{
 #' synAncestry( "syn15663039", "syn1695362" )
-#' # [[1]]
+#' # $syn15663039
 #' # [1] "syn15663039" "syn15673834" "syn15673837" "syn12180284"
 #' #
-#' # [[2]]
+#' # $syn1695362
 #' # [1] "syn1695362" "syn1695324" "syn2812925" "syn300013" 
 #' }
 #' @export
@@ -88,6 +88,17 @@ synAncestry <- function(...)
 #' @param ... One or more Synapse IDs for which children should be retrieved
 #' @param .fullInfo set to TRUE to retrieve the full range of information for each child (default: FALSE)
 #' @return A vector of child instance IDs if .fullInfo is FALSE. A data frame with all relevant info, if .fullInfo is TRUE.
+#' @examples
+#' \dontrun{
+#' synChildren( "syn6185321", "syn5049679" )
+#' # $syn6185321
+#' #          hairpin fasta miRNA mature structure 
+#' #           "syn6185324"           "syn6185325" 
+#' #
+#' # $syn5049679
+#' # hsa_MTI_6.1.csv 
+#' #    "syn5049680" 
+#' }
 #' @export
 synChildren <- function(..., .fullInfo = FALSE)
 {

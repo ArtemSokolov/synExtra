@@ -17,3 +17,15 @@ A vector of child instance IDs if .fullInfo is FALSE. A data frame with all rele
 \description{
 A wrapper around synGetChildren() for multiple Synapse IDs
 }
+\examples{
+\dontrun{
+synChildren( "syn6185321", "syn5049679" )
+# $syn6185321
+#          hairpin fasta miRNA mature structure 
+#           "syn6185324"           "syn6185325" 
+#
+# $syn5049679
+# hsa_MTI_6.1.csv 
+#    "syn5049680" 
+}
+}

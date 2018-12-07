@@ -19,10 +19,10 @@ Recursively reconstructs parentId ancestry for a given Synapse ID
 \examples{
 \dontrun{
 synAncestry( "syn15663039", "syn1695362" )
-# [[1]]
+# $syn15663039
 # [1] "syn15663039" "syn15673834" "syn15673837" "syn12180284"
 #
-# [[2]]
+# $syn1695362
 # [1] "syn1695362" "syn1695324" "syn2812925" "syn300013" 
 }
 }
