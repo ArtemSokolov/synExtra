@@ -122,7 +122,7 @@ synPluck("syn1773109", "C4 Raw Data", "mRNA", "Counts", "htseq-count", "H9.144.7
 # [1] "syn2822560"
 ```
 
-3) Miscellaneous
+## 3) Miscellaneous
 
 `synExtra` provides two additional utility functions: one to determine if something is a valid Synapse ID and another to retrieve the entity name by synapse ID. Similar to the above, both functions work seamlessly with individual IDs, lists and vectors.
 
