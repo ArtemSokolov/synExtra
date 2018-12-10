@@ -2,8 +2,10 @@
 
 Sage Bionetworks develops and maintains [synapser](https://github.com/Sage-Bionetworks/synapser), an R client for interfacing with [Synapse](https://www.synapse.org/). This package builds on top of `synapser` to streamline its usage in a functional programming (FP) paradigm. The package can be installed directly from GitHub by running the following from R:
 
-    if( !require(devtools) ) install.packages( "devtools" )
-    devtools::install_github( "ArtemSokolov/synExtra" )
+``` R
+if( !require(devtools) ) install.packages( "devtools" )
+devtools::install_github( "ArtemSokolov/synExtra" )
+```
 
 The functionality can be loosely grouped into three categories: 1) downloading and uploading of files, 2) traversal of the Synapse directory structure, and 3) miscellaneous inspection of Synapse entities
 
