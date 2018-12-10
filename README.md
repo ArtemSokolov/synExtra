@@ -7,7 +7,7 @@ Sage Bionetworks develops and maintains [synapser](https://github.com/Sage-Bione
 
 The functionality can be loosely grouped into three categories: 1) downloading and uploading of files, 2) traversal of the Synapse directory structure, and 3) miscellaneous inspection of Synapse entities
 
-## Downloading and uploading of files
+## 1) Downloading and uploading of files
 
 File downloading from Synapse is done primarily via `synapser::synGet()`. Since the follow-up action is often to load the downloaded file, a canonical `synGet()` call retrieves the local filename of the downloaded file:
 
@@ -79,5 +79,39 @@ synExtra::synStoreMany( ".", "syn12180284" )
 
 ## As well as relative paths
 synExtra::synStoreMany( "../myOtherFolder", "syn12180284" )
+```
+
+## 2) Traversal of the Synapse directory structure
+
+Similarly to a local filesystem, Synapse entities are organized in a hierarchical fashion. `synExtra` provides several functions for traversing this hierarchy. First, there is `synAncestry()`, which takes one or more of synapse IDs and retrieves their full parentId ancestry up to their respective projects:
+
+``` R
+synAncestry( "syn15663039", "syn1695362" )
+# $syn15663039
+# [1] "syn15663039" "syn15673834" "syn15673837" "syn12180284"
+#
+# $syn1695362
+# [1] "syn1695362" "syn1695324" "syn2812925" "syn300013" 
+```
+
+In the example above, `syn12180284` and `syn300013` are the Synapse projects that host the corresponding entities. Note that `synAncestry()` accepts individual IDs, as well as lists and vectors of IDs. All of the following calls are equivalent:
+``` R
+synAncestry( "syn15663039", "syn1695362" )
+synAncestry( c("syn15663039", "syn1695362") )
+synAncestry( list("syn15663039", "syn1695362") )
+synAncestry( list("syn15663039"), list("syn1695362") )
+```
+
+The second function for traversing the Synapse hierarchy looks in the opposite direction. It's a wrapper around `synGetChildren()` that returns a named vector of synapse IDs, rather than a Python object. As with `synAncestry()`, this second function understands individual IDs, as well as lists and vectors of IDs:
+
+``` R
+synChildren( "syn6185321", "syn5049679" )
+# $syn6185321
+#          hairpin fasta miRNA mature structure
+#           "syn6185324"           "syn6185325"
+#
+# $syn5049679
+# hsa_MTI_6.1.csv
+#    "syn5049680"
 ```
 
