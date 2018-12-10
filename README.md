@@ -115,3 +115,28 @@ synChildren( "syn6185321", "syn5049679" )
 #    "syn5049680"
 ```
 
+The last traversal function allows you to identify the synapse ID of an arbitrary descendant, using the names of entities on the traversal path. For example, suppose we want to retrieve the synapse ID of `C4 Raw Data/mRNA/Counts/htseq-count/H9.144.7.7.txt` from the [Progenitor Cell Biology Consortium](https://www.synapse.org/#!Synapse:syn1773109) project. We can do so by calling `synPluck()` with the synapse ID of the project (`syn1773109`) as the first argument:
+
+``` R
+synPluck("syn1773109", "C4 Raw Data", "mRNA", "Counts", "htseq-count", "H9.144.7.7.txt" )
+# [1] "syn2822560"
+```
+
+3) Miscellaneous
+
+`synExtra` provides two additional utility functions: one to determine if something is a valid Synapse ID and another to retrieve the entity name by synapse ID. Similar to the above, both functions work seamlessly with individual IDs, lists and vectors.
+
+``` R
+isSynID( "syn1234", "syn", "syn123ab" )
+# [1]  TRUE FALSE FALSE
+isSynID( list( mtcars, 123, "syn123" ) )
+# [1] FALSE FALSE  TRUE
+
+synName( "syn1896429", "syn1901530" )
+#                            syn1896429                              syn1901530 
+#        "ESTIMATE_scores_PANCAN11.tsv" "ESTIMATE_scores_PANCAN11_RNASeqV2.tsv"
+synName( c("syn2247543", "syn2653626"), list("syn1773111", "syn2246520") )
+# syn2247543    syn2653626    syn1773111    syn2246520 
+#     "mRNA" "methylation"         "BAM"         "BED" 
+```
+
