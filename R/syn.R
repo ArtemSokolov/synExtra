@@ -118,4 +118,39 @@ synChildren <- function(..., .fullInfo = FALSE)
     if( .fullInfo ) return(res)
     purrr::set_names( res$id, res$name )
 }
-                            
+
+#' Traverse a synapse path
+#'
+#' Starting from the provided synapse ID, traverses descendants by name
+#'
+#' @param sid Synapse ID of the starting entity
+#' @param ... One or more names for constructing a path. Accepts individual names, vectors and lists
+#' @return Synapse ID of the "plucked" entity
+#' @examples
+#' \dontrun{
+#' synPluck( "syn1773110", "mRNA", "Counts", "htseq-count", "H9.144.7.7.txt" )
+#' # [1] "syn2822560"
+#' }
+#' @export
+synPluck <- function( sid, ... )
+{
+    ## Retrieve children of the starting node
+    s <- synChildren( sid )
+    if( length(s) == 0 )
+        stop( paste(sid, "has no children") )
+
+    ## Handle terminal cases
+    l <- purrr::flatten(list(...))
+    if( length(l) == 0 )
+        stop( "Please provide at least one name to index" )
+
+    ## Determine synapse ID of the next child
+    if( !(l[[1]] %in% names(s)) )
+       stop( paste(l[[1]], "is not a child of", sid) )
+    chid <- purrr::pluck(s, l[[1]])
+    if( length(l) == 1 )
+        return( chid )
+
+    ## Recurse
+    synPluck( chid, l[-1] )
+}
