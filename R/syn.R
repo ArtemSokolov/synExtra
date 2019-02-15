@@ -166,13 +166,13 @@ synPluck <- function( sid, ... )
 synRename <- function( sid, newName )
 {
     ## Retrieve the entity
-    s <- synapser::synGet( id, downloadFile=FALSE )
+    s <- synapser::synGet( sid, downloadFile=FALSE )
     
     ## Assign the new name
     s$properties$name <- newName
 
     ## Store the entity back
-    s <- synStore(s)
+    s <- synapser::synStore(s)
     sid
 }
 
