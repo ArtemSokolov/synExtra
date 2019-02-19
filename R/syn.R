@@ -154,3 +154,25 @@ synPluck <- function( sid, ... )
     ## Recurse
     synPluck( chid, l[-1] )
 }
+
+#' Rename a synapse entity
+#'
+#' Assigns a new file name to the synapse entity identified by its ID
+#'
+#' @param sid Synapse ID of the entity to rename
+#' @param newName New filename that should be assigned to the entity
+#' @return Synapse ID of the entity (for integration with the %>% pipe)
+#' @export
+synRename <- function( sid, newName )
+{
+    ## Retrieve the entity
+    s <- synapser::synGet( sid, downloadFile=FALSE )
+    
+    ## Assign the new name
+    s$properties$name <- newName
+
+    ## Store the entity back
+    s <- synapser::synStore(s)
+    sid
+}
+
