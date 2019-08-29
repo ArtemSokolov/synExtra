@@ -4,10 +4,12 @@
 \alias{synDownloader}
 \title{Instantiate a Synapse downloader}
 \usage{
-synDownloader(dloc, ...)
+synDownloader(dloc, useCache = FALSE, ...)
 }
 \arguments{
 \item{dloc}{Path to a local folder where downloaded files will be stored}
+
+\item{useCache}{Use locally cached file if file has already been download and MD5 hasn't changed}
 
 \item{...}{Additional arguments to be passed to synapser::synGet()}
 }

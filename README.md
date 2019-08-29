@@ -68,7 +68,10 @@ Such a script accepts local filenames as well as synapse IDs; in the latter case
 
     Rscript csvpeek.R localFile.csv
     Rscript csvpeek.R syn15663039
-    
+
+Optionally, it is possible to cache files locally and avoid re-downloading them frequently by passing the
+`useCache=TRUE` argument to `synDownloader()`.
+
 ### File uploading
 
 Similarly, file uploading to Synapse is done primarily via `synapser::synStore()`. However, uploading a large number of files in a complicated directory structure can become tedious. `synExtra` provides a wrapper `synStoreMany()` that functions effectively like the Linux `mv` command. The function takes two arguments: a local path and the synapse ID of the Project/Folder where the files are to be uploaded to.
