@@ -10,8 +10,9 @@
 #' Any recognized Synapse IDs get downloaded to the local folder specified by dloc.
 #' The downloader then returns local paths to these files. Strings not recognized to be
 #' valid Synapse IDs are returned as is.
-#' 
+#'
 #' @param dloc Path to a local folder where downloaded files will be stored
+#' @param useCache Use locally cached file if file has already been download and MD5 hasn't changed
 #' @param ... Additional arguments to be passed to synapser::synGet()
 #' @return A downloader function that recognizes synapse IDs and downloads the associated files.
 #' @examples
@@ -22,11 +23,25 @@
 #' }
 #' @importFrom magrittr %>%
 #' @export
-synDownloader <- function( dloc, ... )
+synDownloader <- function( dloc, useCache=FALSE, ... )
 {
     ## Define a downloader for a single id
     dl <- function( id )
-    { synapser::synGet( id, downloadLocation = dloc, ... )$path }
+    {
+        remoteFile <- synapser::synGet( id, downloadFile=FALSE )
+        localPath <- file.path( dloc, remoteFile$properties$name )
+        if ( useCache && file.exists( localPath ) )
+        {
+            message( "Cached version of ", remoteFile$properties$name, " found. Checking MD5 match." )
+            if ( remoteFile$get( "md5" ) == tools::md5sum( localPath ) )
+            {
+                message( "MD5 identical, using cached file." )
+                return( localPath )
+            }
+            message( "MD5 doesn't match, download from Synapse." )
+        }
+        synapser::synGet( id, downloadLocation = dloc, ... )$path
+    }
 
     ## Apply it to all synapse IDs
     function( ... )
@@ -34,7 +49,7 @@ synDownloader <- function( dloc, ... )
 }
 
 #' Upload a directory structure to Synapse
-#' 
+#'
 #' Recursively uploads a directory and all of its content to the given Synapse project/folder
 #'
 #' @param localPath A character string to the local file / directory to upload
@@ -52,7 +67,7 @@ synStoreMany <- function( localPath, parentId )
 
         ## Special case: parent directory
         if( localPath == ".." ) return(synStoreMany( dirname(getwd()), parentId ))
-        
+
         ## Replicate a folder to Synapse
         cat( "Creating", basename(localPath), "\n" )
         f <- synapser::Folder( name = basename(localPath), parentId = parentId ) %>% synapser::synStore()
@@ -62,7 +77,7 @@ synStoreMany <- function( localPath, parentId )
         res <- list.files( localPath, include.dirs=TRUE, full.names=TRUE ) %>%
             purrr::map( synStoreMany, pid ) %>% purrr::flatten() %>% list() %>% setNames( pid )
     }
-    
+
     ## Case 2: localPath is a file; simply upload it
     else
     {
