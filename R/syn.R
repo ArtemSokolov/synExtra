@@ -45,7 +45,34 @@ synName <- function( ... )
     ## Extend the mapping to all the requested values
     idMap[ids]
 }
-    
+
+#' Retrieve parentId
+#'
+#' Retrieves parentIds for one or more of the provided Synapse IDs
+#'
+#' @param ... One or more Synapse IDs for which parent IDs must be retrieved
+#' @return Named character vector that maps the input Synapse IDs their parentIds
+#' @examples
+#' \dontrun{
+#' synParent("syn15663039", "syn1695362" )
+#' #   syn15663039    syn1695362 
+#' # "syn15673834"  "syn1695324"
+#' }
+synParent <- function(...)
+{
+    ## Split up computation, if multiple IDs are provided
+    l <- purrr::flatten(list(...)) %>% purrr::set_names()
+    if( length(l) > 1 ) return( purrr::map_chr(l, synParent) )
+
+    ## Handle a single id
+    id <- unname(unlist(l))
+    if( !isSynID(id) ) stop( paste(id, "is not a valid Synapse ID") )
+
+    ## Retrieve the entity and its parentId
+    s <- synapser::synGet( id, downloadFile=FALSE )
+    s$properties$parentId
+}
+
 #' Retrieve parentId chain
 #'
 #' Recursively reconstructs parentId ancestry for a given Synapse ID
