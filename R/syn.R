@@ -58,10 +58,12 @@ synName <- function( ... )
 #' #   syn15663039    syn1695362 
 #' # "syn15673834"  "syn1695324"
 #' }
+#' @export
 synParent <- function(...)
 {
     ## Split up computation, if multiple IDs are provided
     l <- purrr::flatten(list(...)) %>% purrr::set_names()
+    if( length(l) < 1 ) stop( "Please provide at least one synapse ID" )
     if( length(l) > 1 ) return( purrr::map_chr(l, synParent) )
 
     ## Handle a single id
