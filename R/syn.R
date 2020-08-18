@@ -3,7 +3,7 @@
 ## by Artem Sokolov
 
 #' Check validity of Synapse IDs
-#' 
+#'
 #' Identifies if its argument is a valid Synapse ID character string
 #'
 #' @param ... One or more Synapse IDs. Accepts individual IDs, vectors or lists.
@@ -21,23 +21,23 @@ isSynID <- function( ... )
 }
 
 #' Look up filename based on synapse ID
-#' 
+#'
 #' Retrieves file names associated with given synapse IDs
-#' 
+#'
 #' @param ... One or more Synapse IDs. Accepts individual IDs, vectors or lists.
 #' @return A character vector of filenames corresponding to the provided synapse IDs
 #' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
 #' synName( "syn1896429", "syn1901530" )
-#' #                            syn1896429                              syn1901530 
-#' #        "ESTIMATE_scores_PANCAN11.tsv" "ESTIMATE_scores_PANCAN11_RNASeqV2.tsv" 
+#' #                            syn1896429                              syn1901530
+#' #        "ESTIMATE_scores_PANCAN11.tsv" "ESTIMATE_scores_PANCAN11_RNASeqV2.tsv"
 #' }
 #' @export
 synName <- function( ... )
 {
     ids <- purrr::flatten( list(...) ) %>% purrr::flatten_chr()
-    
+
     ## Isolate the unique set of ids and retrieve the name for each
     idMap <- unique(ids) %>% purrr::set_names() %>%
         purrr::map_chr( ~synapser::synGet( .x, downloadFile=FALSE )$properties$name )
@@ -55,7 +55,7 @@ synName <- function( ... )
 #' @examples
 #' \dontrun{
 #' synParent("syn15663039", "syn1695362" )
-#' #   syn15663039    syn1695362 
+#' #   syn15663039    syn1695362
 #' # "syn15673834"  "syn1695324"
 #' }
 #' @export
@@ -89,7 +89,7 @@ synParent <- function(...)
 #' # [1] "syn15663039" "syn15673834" "syn15673837" "syn12180284"
 #' #
 #' # $syn1695362
-#' # [1] "syn1695362" "syn1695324" "syn2812925" "syn300013" 
+#' # [1] "syn1695362" "syn1695324" "syn2812925" "syn300013"
 #' }
 #' @export
 synAncestry <- function(...)
@@ -99,7 +99,7 @@ synAncestry <- function(...)
     if( length(l) < 1 ) stop( "Please provide at least one synapse ID" )
     if( length(l) > 1 ) return( purrr::map(l, synAncestry) )
     id <- unname(unlist(l))      ## Dealing with a single id
-    
+
     ## Retrieve the entity
     s <- synapser::synGet( id, downloadFile=FALSE )
 
@@ -111,9 +111,9 @@ synAncestry <- function(...)
 }
 
 #' Retrieve child entities
-#' 
+#'
 #' A wrapper around synGetChildren() for multiple Synapse IDs
-#' 
+#'
 #' @param ... One or more Synapse IDs for which children should be retrieved
 #' @param .fullInfo set to TRUE to retrieve the full range of information for each child (default: FALSE)
 #' @return A vector of child instance IDs if .fullInfo is FALSE. A data frame with all relevant info, if .fullInfo is TRUE.
@@ -121,12 +121,12 @@ synAncestry <- function(...)
 #' \dontrun{
 #' synChildren( "syn6185321", "syn5049679" )
 #' # $syn6185321
-#' #          hairpin fasta miRNA mature structure 
-#' #           "syn6185324"           "syn6185325" 
+#' #          hairpin fasta miRNA mature structure
+#' #           "syn6185324"           "syn6185325"
 #' #
 #' # $syn5049679
-#' # hsa_MTI_6.1.csv 
-#' #    "syn5049680" 
+#' # hsa_MTI_6.1.csv
+#' #    "syn5049680"
 #' }
 #' @export
 synChildren <- function(..., .fullInfo = FALSE)
@@ -196,7 +196,7 @@ synRename <- function( sid, newName )
 {
     ## Retrieve the entity
     s <- synapser::synGet( sid, downloadFile=FALSE )
-    
+
     ## Assign the new name
     s$properties$name <- newName
 
@@ -205,3 +205,45 @@ synRename <- function( sid, newName )
     sid
 }
 
+#' Create a synapse directory hierarchy
+#'
+#' Starting from the provided synapse ID, traverse descendants by name like
+#' [synPluck()]. If a child doesn't exist, create a directory with that name.
+#' If `.recursive` is set, also create intermediate directories as necessary.
+#'
+#' Returns Synapse ID of final child like [synPluck()] if the directory already
+#' exists.
+#'
+#' @param sid Synapse ID of the starting entity
+#' @param ... One or more names for constructing a directory hierarchy.
+#'   Accepts individual names, vectors and lists
+#' @param .recursive Whether to create intermediate directories if they don't exist (default: FALSE)
+#' @return Synapse ID of the "plucked" entity
+#' @examples
+#' \dontrun{
+#' synMkdir( "syn1773110", "mRNA", "Counts", "htseq-count" )
+#' # [1] "syn2822494"
+#' }
+#' @export
+synMkdir <- function( sid, ..., .recursive = FALSE )
+{
+    l <- purrr::flatten(list(...))
+    if( length(l) == 0 )
+        stop( "Please provide at least one name to index" )
+
+    for (i in seq_along(l)) {
+        s <- synChildren( sid )
+        if ( l[[i]] %in% names(s) ) {
+            sid <- unname(s[l[[i]]])
+            next
+        }
+        if ( i != length(l) && !.recursive ) {
+            stop( paste(l[[i]], "is not a child of", sid) )
+        }
+        sid <- synapser::Folder(l[[i]], parent = sid) %>%
+            synapser::synStore() %>%
+            purrr::chuck("properties", "id")
+    }
+
+    sid
+}

@@ -18,7 +18,7 @@ Retrieves file names associated with given synapse IDs
 \examples{
 \dontrun{
 synName( "syn1896429", "syn1901530" )
-#                            syn1896429                              syn1901530 
-#        "ESTIMATE_scores_PANCAN11.tsv" "ESTIMATE_scores_PANCAN11_RNASeqV2.tsv" 
+#                            syn1896429                              syn1901530
+#        "ESTIMATE_scores_PANCAN11.tsv" "ESTIMATE_scores_PANCAN11_RNASeqV2.tsv"
 }
 }

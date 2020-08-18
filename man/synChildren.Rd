@@ -21,11 +21,11 @@ A wrapper around synGetChildren() for multiple Synapse IDs
 \dontrun{
 synChildren( "syn6185321", "syn5049679" )
 # $syn6185321
-#          hairpin fasta miRNA mature structure 
-#           "syn6185324"           "syn6185325" 
+#          hairpin fasta miRNA mature structure
+#           "syn6185324"           "syn6185325"
 #
 # $syn5049679
-# hsa_MTI_6.1.csv 
-#    "syn5049680" 
+# hsa_MTI_6.1.csv
+#    "syn5049680"
 }
 }

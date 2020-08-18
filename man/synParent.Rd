@@ -18,7 +18,7 @@ Retrieves parentIds for one or more of the provided Synapse IDs
 \examples{
 \dontrun{
 synParent("syn15663039", "syn1695362" )
-#   syn15663039    syn1695362 
+#   syn15663039    syn1695362
 # "syn15673834"  "syn1695324"
 }
 }

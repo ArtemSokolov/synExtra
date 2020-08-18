@@ -12,7 +12,7 @@ synRename(sid, newName)
 \item{newName}{New filename that should be assigned to the entity}
 }
 \value{
-Synapse ID of the entity (for integration with the %>% pipe)
+Synapse ID of the entity (for integration with the \%>\% pipe)
 }
 \description{
 Assigns a new file name to the synapse entity identified by its ID
