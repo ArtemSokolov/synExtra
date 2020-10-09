@@ -2,22 +2,31 @@
 ##
 ## by Artem Sokolov
 
+SYN_REGEX = c(
+    "with_version" = "^syn[0-9]+(\\.[0-9]+)?$",
+    "plain" = "^syn[0-9]+$"
+)
+
 #' Check validity of Synapse IDs
 #'
 #' Identifies if its argument is a valid Synapse ID character string
 #'
 #' @param ... One or more Synapse IDs. Accepts individual IDs, vectors or lists.
+#' @param .with_version Allow an optional version suffix requesting a specific version (e.g. syn324.4)
 #' @return Logical values indicating whether each element of the input is a valid Synapse ID.
 #' @examples
-#' isSynID( "syn1234", "syn", "syn123ab" )
-#' # [1]  TRUE FALSE FALSE
+#' isSynID( "syn1234", "syn", "syn123ab", "syn123.5" )
+#' # [1]  TRUE FALSE FALSE FALSE
+#' isSynID( "syn1234", "syn", "syn123ab", "syn123.5", .with_version = TRUE )
+#' # [1]  TRUE FALSE FALSE TRUE
 #' isSynID( list( mtcars, 123, "syn123" ) )
 #' # [1] FALSE FALSE  TRUE
 #' @export
-isSynID <- function( ... )
+isSynID <- function( ..., .with_version = FALSE )
 {
+    version <- if (.with_version) "with_version" else "plain"
     ids <- purrr::flatten(list(...))
-    purrr::map_lgl( ids, is.character ) & grepl("^syn[0-9]+$", ids)
+    purrr::map_lgl( ids, is.character ) & grepl(SYN_REGEX[version], ids)
 }
 
 #' Look up filename based on synapse ID

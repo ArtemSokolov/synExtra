@@ -22,6 +22,9 @@ A downloader is itself a function that accepts a vector or list of character str
 Any recognized Synapse IDs get downloaded to the local folder specified by dloc.
 The downloader then returns local paths to these files. Strings not recognized to be
 valid Synapse IDs are returned as is.
+
+Download specific versions of files stored on Synapse by suffixing the ID with
+a version number, e.g. syn123.5
 }
 \examples{
 \dontrun{
