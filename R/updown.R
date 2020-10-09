@@ -11,6 +11,9 @@
 #' The downloader then returns local paths to these files. Strings not recognized to be
 #' valid Synapse IDs are returned as is.
 #'
+#' Download specific versions of files stored on Synapse by suffixing the ID with
+#' a version number, e.g. syn123.5
+#'
 #' @param dloc Path to a local folder where downloaded files will be stored
 #' @param ... Additional arguments to be passed to synapser::synGet()
 #' @return A downloader function that recognizes synapse IDs and downloads the associated files.
@@ -25,12 +28,18 @@
 synDownloader <- function( dloc, ... )
 {
     ## Define a downloader for a single id
-    dl <- function( id )
-    { synapser::synGet( id, downloadLocation = dloc, ... )$path }
-
+    dl <- function( id ) {
+        id_split <- strsplit(id, ".", fixed = TRUE)[[1]]
+        if ( length(id_split) == 2 ) {
+            id <- id_split[1]
+            version <- id_split[2]
+        } else
+            version <- NULL
+        synapser::synGet( id, downloadLocation = dloc, version = version, ... )$path
+    }
     ## Apply it to all synapse IDs
     function( ... )
-    { purrr::flatten(list(...)) %>% purrr::map_if( isSynID, dl ) %>% purrr::flatten_chr() }
+    { purrr::flatten(list(...)) %>% purrr::map_if( isSynID(., .with_version = TRUE), dl ) %>% purrr::flatten_chr() }
 }
 
 #' Upload a directory structure to Synapse

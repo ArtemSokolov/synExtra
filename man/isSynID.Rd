@@ -4,10 +4,12 @@
 \alias{isSynID}
 \title{Check validity of Synapse IDs}
 \usage{
-isSynID(...)
+isSynID(..., .with_version = FALSE)
 }
 \arguments{
 \item{...}{One or more Synapse IDs. Accepts individual IDs, vectors or lists.}
+
+\item{.with_version}{Allow an optional version suffix requesting a specific version (e.g. syn324.4)}
 }
 \value{
 Logical values indicating whether each element of the input is a valid Synapse ID.
@@ -16,8 +18,10 @@ Logical values indicating whether each element of the input is a valid Synapse I
 Identifies if its argument is a valid Synapse ID character string
 }
 \examples{
-isSynID( "syn1234", "syn", "syn123ab" )
-# [1]  TRUE FALSE FALSE
+isSynID( "syn1234", "syn", "syn123ab", "syn123.5" )
+# [1]  TRUE FALSE FALSE FALSE
+isSynID( "syn1234", "syn", "syn123ab", "syn123.5", .with_version = TRUE )
+# [1]  TRUE FALSE FALSE TRUE
 isSynID( list( mtcars, 123, "syn123" ) )
 # [1] FALSE FALSE  TRUE
 }
