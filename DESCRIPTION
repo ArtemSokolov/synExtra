@@ -1,6 +1,6 @@
 Package: synExtra
 Title: Extension of R Synapse Client
-Version: 0.3.5
+Version: 0.3.6
 Authors@R: c(person("Artem", "Sokolov", email = "artem.sokolov@gmail.com", role = c("aut", "cre")),
     person("Clemens", "Hug", email = "clemens.hug@gmail.com", role = "aut"))
 Description: Features, extensions and UI modifications built on top of Sage Bionetworks' synapser.

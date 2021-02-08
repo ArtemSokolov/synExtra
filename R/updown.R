@@ -48,22 +48,22 @@ synDownloader <- function( dloc, ... )
 #'
 #' @param localPath A character string or vector of strings to the local file / directory to upload
 #' @param parentId A synapse ID of the hosting project or parent folder on Synapse
-#' @param activity An Activity metadata object, see \link[synapser]{Activity}
+#' @param ... Additional parameters for \link[synapser]{synStore}
 #' @importFrom magrittr %>%
 #' @return A nested list capturing the created hierarchy of Synapse IDs
 #' @export
-synStoreMany <- function( localPath, parentId, activity = NULL )
+synStoreMany <- function( localPath, parentId, ... )
 {
-    if ( length(localPath) > 1 ) return( purrr::map( localPath, synStoreMany, parentId, activity ) )
+    if ( length(localPath) > 1 ) return( purrr::map( localPath, synStoreMany, parentId, ... ) )
 
     ## Case 1: localPath is a directory
     if( dir.exists(localPath) )
     {
         ## Special case: current directory
-        if( localPath == "." ) return(synStoreMany( getwd(), parentId, activity ))
+        if( localPath == "." ) return(synStoreMany( getwd(), parentId, ... ))
 
         ## Special case: parent directory
-        if( localPath == ".." ) return(synStoreMany( dirname(getwd()), parentId, activity ))
+        if( localPath == ".." ) return(synStoreMany( dirname(getwd()), parentId, ... ))
 
         ## Replicate a folder to Synapse
         cat( "Creating", basename(localPath), "\n" )
@@ -72,13 +72,13 @@ synStoreMany <- function( localPath, parentId, activity = NULL )
 
         ## Recurse onto files in the directory
         res <- list.files( localPath, include.dirs=TRUE, full.names=TRUE ) %>%
-            purrr::map( synStoreMany, pid, activity=activity ) %>% purrr::flatten() %>% list() %>% setNames( pid )
+            purrr::map( synStoreMany, pid, ... ) %>% purrr::flatten() %>% list() %>% setNames( pid )
     }
 
     ## Case 2: localPath is a file; simply upload it
     else
     {
-        f <- synapser::File( path=localPath, parent=parentId ) %>% synapser::synStore(activity=activity)
+        f <- synapser::File( path=localPath, parent=parentId ) %>% synapser::synStore(...)
         cat( "\n" )
         res <- list(localPath) %>% setNames( f$properties$id )
     }
