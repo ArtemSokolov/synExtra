@@ -4,14 +4,14 @@
 \alias{synStoreMany}
 \title{Upload a directory structure to Synapse}
 \usage{
-synStoreMany(localPath, parentId, activity = NULL)
+synStoreMany(localPath, parentId, ...)
 }
 \arguments{
 \item{localPath}{A character string or vector of strings to the local file / directory to upload}
 
 \item{parentId}{A synapse ID of the hosting project or parent folder on Synapse}
 
-\item{activity}{An Activity metadata object, see \link[synapser]{Activity}}
+\item{...}{Additional parameters for \link[synapser]{synStore}}
 }
 \value{
 A nested list capturing the created hierarchy of Synapse IDs

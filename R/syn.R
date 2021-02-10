@@ -105,3 +105,41 @@ synRename <- function( sid, newName )
     sid
 }
 
+#' Retrieve the size of a synapse entity
+#'
+#' Returns the size of a file. For folders, returns the sum of sizes for all files inside that folder
+#'
+#' @param ... One or more Synapse IDs for which parent IDs must be retrieved
+#' @return Named character vector that maps the input Synapse IDs their file sizes
+#' @examples
+#' \dontrun{
+#' synSize( "syn1695362", "syn1695324" )
+#' # syn1695362  syn1695324
+#' # 1678169935 11682238368
+#' }
+#' @export
+synSize <- function(...)
+{
+    ## Split up computation, if multiple IDs are provided
+    l <- purrr::flatten(list(...)) %>% purrr::set_names()
+    if( length(l) < 1 ) stop( "Please provide at least one synapse ID" )
+    if( length(l) > 1 ) return( purrr::map_dbl(l, synSize) )
+
+    ## Handle a single id
+    id <- unname(unlist(l))
+    if( !isSynID(id) ) stop( paste(id, "is not a valid Synapse ID") )
+
+    ## Retrieve the entity
+    s <- synapser::synGet( id, downloadFile=FALSE )
+
+    ## In case of the file, return its size
+    lst <- s$local_state()
+    if( length(lst) > 0 ) return( lst$`_file_handle`$contentSize )
+
+    ## Recurse on folders
+    ch <- synChildren(id)
+    if( length(ch) > 0 ) return( sum(synSize(ch)) )
+
+    ## Empty folders have size zero
+    return(0)
+}
