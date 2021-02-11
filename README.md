@@ -131,16 +131,15 @@ synPluck("syn1773109", list("C4 Raw Data", "mRNA", "Counts", "htseq-count", "H9.
 ## 3) Miscellaneous
 
 `synExtra` provides several additional utility functions. These allow you to
-* determine if something is a valid Synapse ID,
-* retrieve the entity name by Synapse ID,
-* and rename an entity identified by its Synapse ID.
 
 ``` R
+# determine if something is a valid Synapse ID
 isSynID( "syn1234", "syn", "syn123ab" )
 # [1]  TRUE FALSE FALSE
 isSynID( list( mtcars, 123, "syn123" ) )
 # [1] FALSE FALSE  TRUE
 
+# retrieve the entity name by Synapse ID
 synName( "syn1896429", "syn1901530" )
 #                            syn1896429                              syn1901530 
 #        "ESTIMATE_scores_PANCAN11.tsv" "ESTIMATE_scores_PANCAN11_RNASeqV2.tsv"
@@ -148,8 +147,14 @@ synName( c("syn2247543", "syn2653626"), list("syn1773111", "syn2246520") )
 # syn2247543    syn2653626    syn1773111    syn2246520 
 #     "mRNA" "methylation"         "BAM"         "BED" 
 
+# rename an entity identified by its Synapse ID.
 # synRename() returns the provided Synapse ID for easy integration with %>% pipe
 synRename( "syn123", "newfilename.csv" )
 # [1] "syn123"
+
+# Retrieve the size of a file or all content inside a folder
+synSize( "syn1695362", "syn1695324" )
+# syn1695362  syn1695324
+# 1678169935 11682238368
 ```
 
