@@ -117,7 +117,7 @@ synChildren( "syn6185321", "syn5049679" )
 #    "syn5049680"
 ```
 
-The last traversal function allows you to identify the synapse ID of an arbitrary descendant, using the names of entities on the traversal path. For example, suppose we want to retrieve the synapse ID of `C4 Raw Data/mRNA/Counts/htseq-count/H9.144.7.7.txt` from the [Progenitor Cell Biology Consortium](https://www.synapse.org/#!Synapse:syn1773109) project. We can do so by calling `synPluck()` with the synapse ID of the project (`syn1773109`) as the first argument:
+The third traversal function allows you to identify the synapse ID of an arbitrary descendant, using the names of entities on the traversal path. For example, suppose we want to retrieve the synapse ID of `C4 Raw Data/mRNA/Counts/htseq-count/H9.144.7.7.txt` from the [Progenitor Cell Biology Consortium](https://www.synapse.org/#!Synapse:syn1773109) project. We can do so by calling `synPluck()` with the synapse ID of the project (`syn1773109`) as the first argument:
 
 ``` R
 synPluck("syn1773109", "C4 Raw Data", "mRNA", "Counts", "htseq-count", "H9.144.7.7.txt")
@@ -126,6 +126,19 @@ synPluck("syn1773109", "C4 Raw Data", "mRNA", "Counts", "htseq-count", "H9.144.7
 ## Or equivalently
 synPluck("syn1773109", c("C4 Raw Data", "mRNA", "Counts", "htseq-count", "H9.144.7.7.txt"))
 synPluck("syn1773109", list("C4 Raw Data", "mRNA", "Counts", "htseq-count", "H9.144.7.7.txt"))
+```
+
+The last traversal function allows you to find files on Synapse that match a
+given wildcard pattern. The syntax for how wildcards are interpreted follows the
+["glob" convention](https://en.wikipedia.org/wiki/Glob_(programming)) used in
+most shell environments for file name matching.
+
+In this example, all .bam files starting with "H9." in the given directory
+are selected.
+``` R
+synGlob("syn1773109", "C4 Raw Data", "mRNA", "BAM", "H9.*.bam")
+# H9.102.2.5.bam H9.102.2.6.bam H9.119.3.7.bam H9.119.5.3.bam H9.144.7.7.bam 
+#  "syn2246875"   "syn2246913"   "syn2246970"   "syn2246992"   "syn2247034"
 ```
 
 ## 3) Miscellaneous
