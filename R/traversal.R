@@ -149,3 +149,51 @@ synMkdir <- function( sid, ..., .recursive = FALSE )
 
     sid
 }
+
+#' Traverse a synapse path with wildcard matching
+#'
+#' Starting from the provided synapse ID, traverses descendants by name
+#' that can contain wildcards (*) that match an arbitrary number of characters.
+#'
+#' Details about glob wildcard character matching are available in the
+#' [Wikipedia article](https://en.wikipedia.org/wiki/Glob_(programming)).
+#'
+#' @param sid Synapse ID of the starting entity
+#' @param ... One or more names for constructing a path. Accepts individual names, vectors and lists
+#' @param .nested Return synapse paths as flat vector (FALSE) or as nested list
+#'   following the directory structure (TRUE)
+#' @return Synapse IDs of the "plucked" entities
+#' @examples
+#' \dontrun{
+#' synGlob( "syn26348949", "Runs", "*", "meta", "*.csv" )
+#  # [1] "syn26349230" "syn26349250" "syn26349251" "syn26349268"
+#' }
+#' @export
+synGlob <- function( sid, ..., .nested = FALSE )
+{
+  ## Retrieve children of the starting node
+  s <- synChildren( sid )
+  if( length(s) == 0 )
+    return( character() )
+
+  ## Handle terminal cases
+  l <- purrr::flatten(list(...))
+  if( length(l) == 0 )
+    stop( "Please provide at least one name to index" )
+
+  ## Determine synapse ID of the next children
+  matches <- grep( glob2rx(l[[1]]), names(s), value = TRUE )
+  chids <- s[matches]
+  if( length(l) == 1 )
+    return( chids )
+
+  ## Recurse
+  r <- purrr::map( chids, synGlob, l[-1], .nested = .nested ) %>%
+    ## Remove empty nodes
+    purrr::compact()
+  if (!.nested && !is.null(r))
+    ## Remove names
+    r <- purrr::set_names(r, NULL) %>%
+      unlist()
+  r
+}
