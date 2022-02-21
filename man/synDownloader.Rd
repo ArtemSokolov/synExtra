@@ -4,12 +4,16 @@
 \alias{synDownloader}
 \title{Instantiate a Synapse downloader}
 \usage{
-synDownloader(dloc, ...)
+synDownloader(dloc, ..., .cache = FALSE)
 }
 \arguments{
 \item{dloc}{Path to a local folder where downloaded files will be stored}
 
 \item{...}{Additional arguments to be passed to synapser::synGet()}
+
+\item{.cache}{Save files into directories inside dloc corresponding to their
+md5 hashes. Repeated requests for identical files will re-use already
+downloaded files}
 }
 \value{
 A downloader function that recognizes synapse IDs and downloads the associated files.

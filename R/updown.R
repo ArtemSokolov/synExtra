@@ -16,6 +16,9 @@
 #'
 #' @param dloc Path to a local folder where downloaded files will be stored
 #' @param ... Additional arguments to be passed to synapser::synGet()
+#' @param .cache Save files into directories inside dloc corresponding to their
+#'   md5 hashes. Repeated requests for identical files will re-use already
+#'   downloaded files
 #' @return A downloader function that recognizes synapse IDs and downloads the associated files.
 #' @examples
 #' \dontrun{
@@ -25,7 +28,7 @@
 #' }
 #' @importFrom magrittr %>%
 #' @export
-synDownloader <- function( dloc, ... )
+synDownloader <- function( dloc, ..., .cache = FALSE )
 {
     ## Define a downloader for a single id
     dl <- function( id ) {
@@ -35,6 +38,17 @@ synDownloader <- function( dloc, ... )
             version <- id_split[2]
         } else
             version <- NULL
+        if ( .cache ) {
+          syn_meta <- synapser::synGet( id, downloadFile = FALSE, version = version, ... )
+          file_loc <- file.path(
+            dloc, syn_meta$get("md5"), syn_meta$get("name")
+          )
+          if ( file.exists(file_loc) ) {
+            message( "Using cached ", syn_meta$get("name") )
+            return( file_loc )
+          } else
+            return( synapser::synGet( id, downloadLocation = file.path(dloc, syn_meta$get("md5")), version = version, ifcollision = "keep.local", ... )$path )
+        }
         synapser::synGet( id, downloadLocation = dloc, version = version, ... )$path
     }
     ## Apply it to all synapse IDs
