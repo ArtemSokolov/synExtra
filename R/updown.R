@@ -40,14 +40,37 @@ synDownloader <- function( dloc, ..., .cache = FALSE )
             version <- NULL
         if ( .cache ) {
           syn_meta <- synapser::synGet( id, downloadFile = FALSE, version = version, ... )
+          # File name on Synapse and "download as" file name may be different
+          # in rare cases. E.g. https://www.synapse.org/#!Synapse:syn21088596
+          # Displayed as ROSMAP_assay_RNAseq_metadata.csv, downloaded as ROSMAP_assay_rnaSeq_metadata.csv
+          # Figure out "download as" file name using direct API request
+          file_handle <- synapser::synRestPOST(
+            "/fileHandle/batch",
+            jsonlite::toJSON(
+              list(
+                includeFileHandles = jsonlite::unbox(TRUE),
+                includePreSignedURLs = jsonlite::unbox(FALSE),
+                requestedFiles = list(
+                  list(
+                    fileHandleId = jsonlite::unbox(syn_meta$properties$dataFileHandleId),
+                    associateObjectId = jsonlite::unbox(id),
+                    associateObjectType = jsonlite::unbox("FileEntity")
+                  )
+                )
+              )
+            ),
+            "https://file-prod.prod.sagebase.org/file/v1"
+          )
+          if ( !is.null(file_handle$requestedFiles[[1]]$failureCode) )
+            stop( "Failed to obtain file handle. Error code: ", file_handle$requestedFiles[[1]]$failureCode )
           file_loc <- file.path(
-            dloc, syn_meta$get("md5"), syn_meta$get("name")
+            dloc, syn_meta$get("md5"), file_handle$requestedFiles[[1]]$fileHandle$fileName
           )
           if ( file.exists(file_loc) ) {
-            message( "Using cached ", syn_meta$get("name") )
+            message( "Using cached ", file_handle$requestedFiles[[1]]$fileHandle$fileName )
             return( file_loc )
           } else
-            return( synapser::synGet( id, downloadLocation = file.path(dloc, syn_meta$get("md5")), version = version, ifcollision = "keep.local", ... )$path )
+            return( synapser::synGet( id, downloadLocation = file.path(dloc, syn_meta$get("md5")), version = version, ifcollision = "overwrite.local", ... )$path )
         }
         synapser::synGet( id, downloadLocation = dloc, version = version, ... )$path
     }

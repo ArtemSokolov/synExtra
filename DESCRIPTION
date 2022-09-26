@@ -1,13 +1,14 @@
 Package: synExtra
 Title: Extension of R Synapse Client
-Version: 0.4.3
+Version: 0.4.4
 Authors@R: c(person("Artem", "Sokolov", email = "artem.sokolov@gmail.com", role = c("aut", "cre")),
     person("Clemens", "Hug", email = "clemens.hug@gmail.com", role = "aut"))
 Description: Features, extensions and UI modifications built on top of Sage Bionetworks' synapser.
 Depends: R (>= 3.4)
 Imports:
     tidyverse,
-    synapser
+    synapser,
+    jsonlite
 License: MIT
 Encoding: UTF-8
 LazyData: true
